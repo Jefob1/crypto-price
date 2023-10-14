@@ -15,7 +15,7 @@ const base = new Airtable({
     "pat6Kyz5adkq28PFZ.9362de1ecd7b06c7b82bab90d6db803478850fd20c7cd59653fd441a74b728c0",
 }).base("appHGoZ55MSJXyc8j");
 
-async function updateAirtable() {
+async function updateAirtable(res) {
   try {
     console.log("Connecting to Airtable...");
     const response = await axios.get(COINSTATS_API_URL, {
@@ -25,61 +25,63 @@ async function updateAirtable() {
       },
     });
 
+    console.log("API Response", response.data);
+
     const bitcoinPrice = response.data.coins[0]?.price;
     const ethereumPrice = response.data.coins[1]?.price;
     const usdtPrice = response.data.coins[2]?.price;
-    const bscPrice = response.data.coins[3]?.price;
-    const ripplePrice = response.data.coins[5]?.price;
-    const solPrice = response.data.coins[9]?.price;
+    const bnbPrice = response.data.coins[3]?.price;
+    const ripplePrice = response.data.coins[4]?.price;
+    const solPrice = response.data.coins[7]?.price;
 
     base("Crypto Price").update(
       [
         {
+          id: "rec3A2Wa3oi1jn2sq",
           fields: {
-            id: "rec3A2Wa3oi1jn2sq",
             Name: "Bitcoin",
             Symbol: "BTC",
             Price: bitcoinPrice,
           },
         },
         {
+          id: "reccndk9qnuTfdqVZ",
           fields: {
-            id: "reccndk9qnuTfdqVZ",
             Name: "Ethereum",
             Symbol: "ETH",
             Price: ethereumPrice,
           },
         },
         {
+          id: "recADveP2WyJn5Ni9",
           fields: {
-            id: "recADveP2WyJn5Ni9",
             Name: "Solana",
             Symbol: "SOL",
             Price: solPrice,
           },
         },
         {
+          id: "recZCtgAKFT1VFZCP",
           fields: {
-            id: "recZCtgAKFT1VFZCP",
             Name: "Ripple",
             Symbol: "XRP",
             Price: ripplePrice,
           },
         },
         {
+          id: "recCkdrjZlzGoZ6Di",
           fields: {
-            id: "recCkdrjZlzGoZ6Di",
             Name: "Tether USD",
             Symbol: "USDT",
             Price: usdtPrice,
           },
         },
         {
+          id: "rec2BlSt72sLll5mZ",
           fields: {
-            id: "rec2BISt72sLII5mZ",
-            Name: "Binance Smart Chain",
-            Symbol: "BSC",
-            Price: bscPrice,
+            Name: "Binance Coin",
+            Symbol: "BNB",
+            Price: bnbPrice,
           },
         },
       ],
@@ -107,9 +109,9 @@ async function updateAirtable() {
   }
 }
 
-setInterval(() => {
-  updateAirtable;
-}, 300000);
+app.post("/webhook", async (req, res) => {
+  await updateAirtable(res);
+});
 
 app.listen(port, () => {
   console.log(`Webhook service listening at http://localhost:${port}`);
